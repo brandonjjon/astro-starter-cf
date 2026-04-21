@@ -67,5 +67,16 @@ export default defineConfig({
 
 	vite: {
 		plugins: [tailwindcss()],
+		optimizeDeps: {
+			// Workers-virtual + odd-shaped modules bypass the dep optimizer.
+			exclude: ['cloudflare:email', 'mimetext'],
+		},
+		ssr: {
+			// Astro internals are late-discovered and trip SSR optimizer mid-session.
+			// Pre-including keeps them in the initial bundle and avoids HMR reload churn.
+			optimizeDeps: {
+				include: ['astro/zod', 'astro/env/runtime'],
+			},
+		},
 	},
 });

@@ -20,3 +20,13 @@ playwright-report/
 
 .DS_Store
 .idea/
+
+# AI tooling local state (not shared)
+.agents/
+.augment/
+.claude/
+.codebuddy/
+.continue/
+.junie/
+.kiro/
+skills-lock.json
