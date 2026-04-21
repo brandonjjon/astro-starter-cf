@@ -8,13 +8,6 @@
 		"binding": "ASSETS",
 		"directory": "./dist",
 		"not_found_handling": "404-page",
-		// Route every request through the Worker first. Astro's adapter entrypoint
-		// calls `ASSETS.fetch()` for static paths, so prerendered pages still serve
-		// from the edge — but SSR routes (like /contact) can never be intercepted
-		// by CF's static-asset fallback. Without this, a transient 404 during a
-		// deploy can get edge-cached at the "navigation request" cache key and
-		// browsers get stuck on it while curl (with different headers) works fine.
-		"run_worker_first": true,
 	},
 	"observability": {
 		"enabled": true,
@@ -33,6 +26,16 @@
 		{
 			"name": "EMAIL",
 			// "allowed_sender_addresses": ["noreply@yourdomain.com"],
+		},
+	],
+	// Rate limit contact form submissions. `namespace_id` is any stable string
+	// unique within your account — not a resource to provision. Keys we pass to
+	// `.limit({ key })` are IP addresses, so one abuser can't starve others.
+	"ratelimits": [
+		{
+			"name": "RATE_LIMITER",
+			"namespace_id": "1001",
+			"simple": { "limit": 5, "period": 60 },
 		},
 	],
 	// Uncomment to enable Astro sessions (KV-backed). Also add a `session:`
