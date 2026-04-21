@@ -31,6 +31,12 @@
 		"CONTACT_TO_EMAIL": "hello@example.com",
 		"CONTACT_FROM_EMAIL": "noreply@example.com",
 	},
+	// Preserve runtime vars set via the Cloudflare dashboard across deploys.
+	// Without this, every `wrangler deploy` resets vars to the values above,
+	// clobbering edits you make in Worker → Settings → Variables. Defaults
+	// above are only applied on the first deploy (or if you remove them from
+	// the dashboard).
+	"keep_vars": true,
 	// Cloudflare Email Sending binding (https://developers.cloudflare.com/email-service).
 	// Prereq: your domain must be onboarded + verified in Dashboard → Email → Email Sending.
 	// Optional: uncomment `allowed_sender_addresses` to lock which From addresses this
