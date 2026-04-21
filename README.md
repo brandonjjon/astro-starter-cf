@@ -53,7 +53,8 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
 - **Lefthook** — pre-commit (prettier/eslint/gitleaks), pre-push (check/test), commit-msg (commitlint)
 - **Vitest** unit + **Playwright** E2E + **axe-core** a11y + **Lighthouse CI**
 - **Renovate** with `minimumReleaseAge: 7 days`
-- **GitHub Actions** — CI (lint/type/test/build) + Lighthouse on PRs + auto-deploy to Workers on `main`
+- **Workers Builds** auto-deploy on push to `main` (CF-native CI/CD, set up via deploy button or dashboard import)
+- **GitHub Actions** — CI (lint/type/test/build) + Lighthouse on PRs
 - **mise** pins Bun + gitleaks per project
 
 ## Scripts
@@ -70,7 +71,7 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
 | `bun run test`      | Vitest                                                           |
 | `bun run test:e2e`  | Playwright + axe                                                 |
 | `bun run lhci`      | Lighthouse CI                                                    |
-| `bun run cf:deploy` | `wrangler deploy` — manual deploy (CI handles the usual case)    |
+| `bun run cf:deploy` | `wrangler deploy` — manual deploy (Workers Builds handles main)  |
 
 ## Configure for your project
 
@@ -84,11 +85,10 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
    - Local dev: copy `.dev.vars.example` → `.dev.vars` (auto-loaded by `astro dev` and `wrangler dev`)
    - Production non-secrets: add to `wrangler.jsonc` `vars` block or set via dashboard
    - Production secrets: `wrangler secret put TURNSTILE_SECRET_KEY` (prompts, stores encrypted)
-5. **GitHub Actions auto-deploy** — push to `main` triggers `.github/workflows/deploy.yml`. Add two repo secrets:
-   - `CLOUDFLARE_API_TOKEN` — Dashboard → My Profile → API Tokens → _Edit Cloudflare Workers_ template
-   - `CLOUDFLARE_ACCOUNT_ID` — Dashboard → Workers & Pages → right sidebar
-6. **OG image** — drop `public/og.png` (1200×630)
-7. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
+5. **Deploy** — either click the [Deploy to Cloudflare](#get-started) button (clones + auto-configures Workers Builds), or for an existing repo: **CF Dashboard → Workers & Pages → Create → Import a repository → pick your repo → Save and Deploy**. CF autodetects Astro + bun.lock, runs `bun run build`, then `wrangler deploy`. Every push to `main` afterwards auto-deploys.
+6. **Branch protection (recommended)** — require CI (`lint/check/test/build`) to pass on `main` before Workers Builds deploys. Settings → Branches → Add rule → `main` → _Require status checks to pass_ → select `CI / check`.
+7. **OG image** — drop `public/og.png` (1200×630)
+8. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
 
 ## Project structure
 
