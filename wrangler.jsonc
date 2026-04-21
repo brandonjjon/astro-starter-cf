@@ -28,7 +28,7 @@
 	// variable) once you do — astro.config.ts reads it via process.env, and
 	// the next build will bake correct sitemap + canonical URLs.
 	"vars": {
-		"CONTACT_TO_EMAIL": "hello@example.com",
+		"CONTACT_TO_EMAIL": "brandon@blackdogmade.com",
 		"CONTACT_FROM_EMAIL": "noreply@example.com",
 	},
 	// Preserve runtime vars set via the Cloudflare dashboard across deploys.

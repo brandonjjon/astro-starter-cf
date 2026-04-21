@@ -1,5 +1,9 @@
 # Copy to .dev.vars for local `astro dev` / `wrangler dev`.
-# Secrets only — plaintext vars live in wrangler.jsonc `vars` block.
-# Production secrets: set via Deploy-to-CF form or `wrangler secret put`.
+# The Deploy-to-CF button prompts for every value here during first deploy.
+# All four are stored as Worker runtime vars (encrypted at rest), so later
+# wrangler deploys never touch them — dashboard edits persist. Edit in
+# Worker → Settings → Variables → [select var] → Edit.
 TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+CONTACT_TO_EMAIL=hello@example.com
+CONTACT_FROM_EMAIL=noreply@example.com
