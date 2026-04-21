@@ -16,11 +16,16 @@ export const server = {
 			'cf-turnstile-response': z.string().optional(),
 		}),
 		handler: async (input, context) => {
-			// Turnstile is fully opt-in: set both PUBLIC_TURNSTILE_SITE_KEY and
-			// TURNSTILE_SECRET_KEY in Worker runtime vars to enable the widget +
-			// server-side verification. When either is missing, the captcha step
-			// is skipped and the form still works.
-			if (TURNSTILE_SECRET_KEY) {
+			// Paired test secret — see ContactForm.astro. Always-passes for
+			// test-key tokens, so workers.dev deploys validate end-to-end
+			// without real Turnstile credentials.
+			const TEST_SECRET_KEY = '1x0000000000000000000000000000000AA';
+			const isWorkersDevHost = new URL(context.request.url).hostname.endsWith(
+				'.workers.dev',
+			);
+			const secret = isWorkersDevHost ? TEST_SECRET_KEY : TURNSTILE_SECRET_KEY;
+
+			if (secret) {
 				const token = input['cf-turnstile-response'];
 				if (!token) {
 					throw new ActionError({
@@ -29,7 +34,7 @@ export const server = {
 					});
 				}
 				const form = new FormData();
-				form.append('secret', TURNSTILE_SECRET_KEY);
+				form.append('secret', secret);
 				form.append('response', token);
 				const ip = context.request.headers.get('CF-Connecting-IP');
 				if (ip) form.append('remoteip', ip);

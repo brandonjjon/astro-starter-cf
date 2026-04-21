@@ -3,7 +3,15 @@ import { actions } from 'astro:actions';
 import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/server';
 
 const result = Astro.getActionResult(actions.submitContact);
-const siteKey = PUBLIC_TURNSTILE_SITE_KEY;
+
+// Cloudflare's official always-pass test site key — rendered on *.workers.dev
+// so preview/test deploys get the full widget without needing real Turnstile
+// credentials. Real keys from the Turnstile dashboard are used on custom
+// domains (the widget validates against the hostname registered there).
+// https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+const TEST_SITE_KEY = '1x00000000000000000000AA';
+const isWorkersDevHost = Astro.url.hostname.endsWith('.workers.dev');
+const siteKey = isWorkersDevHost ? TEST_SITE_KEY : PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 {
