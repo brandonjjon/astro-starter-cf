@@ -3,6 +3,14 @@ import { actions } from 'astro:actions';
 import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/server';
 
 const result = Astro.getActionResult(actions.submitContact);
+
+// Cloudflare's official always-pass test site key. Used on *.workers.dev
+// so preview/test deploys work without configuring a real Turnstile site.
+// Real keys from the Turnstile dashboard are used on custom domains.
+// https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+const TEST_SITE_KEY = '1x00000000000000000000AA';
+const isWorkersDevHost = Astro.url.hostname.endsWith('.workers.dev');
+const siteKey = isWorkersDevHost ? TEST_SITE_KEY : PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <form
@@ -42,11 +50,7 @@ const result = Astro.getActionResult(actions.submitContact);
 			rows="5"
 			class="rounded border border-black/20 px-3 py-2"></textarea>
 	</label>
-	{
-		PUBLIC_TURNSTILE_SITE_KEY && (
-			<div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} />
-		)
-	}
+	{siteKey && <div class="cf-turnstile" data-sitekey={siteKey} />}
 	<button
 		type="submit"
 		class="rounded bg-black px-4 py-2 text-white hover:bg-black/80"
@@ -62,7 +66,7 @@ const result = Astro.getActionResult(actions.submitContact);
 </form>
 
 {
-	PUBLIC_TURNSTILE_SITE_KEY && (
+	siteKey && (
 		<script
 			is:inline
 			src="https://challenges.cloudflare.com/turnstile/v0/api.js"

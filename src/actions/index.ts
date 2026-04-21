@@ -16,7 +16,16 @@ export const server = {
 			'cf-turnstile-response': z.string().optional(),
 		}),
 		handler: async (input, context) => {
-			if (TURNSTILE_SECRET_KEY) {
+			// Pair of Cloudflare's official always-pass test keys — used on
+			// *.workers.dev so preview/test deploys validate without real Turnstile
+			// credentials. ContactForm.astro emits the matching test site key.
+			const TEST_SECRET_KEY = '1x0000000000000000000000000000000AA';
+			const isWorkersDevHost = new URL(context.request.url).hostname.endsWith(
+				'.workers.dev',
+			);
+			const secret = isWorkersDevHost ? TEST_SECRET_KEY : TURNSTILE_SECRET_KEY;
+
+			if (secret) {
 				const token = input['cf-turnstile-response'];
 				if (!token) {
 					throw new ActionError({
@@ -25,7 +34,7 @@ export const server = {
 					});
 				}
 				const form = new FormData();
-				form.append('secret', TURNSTILE_SECRET_KEY);
+				form.append('secret', secret);
 				form.append('response', token);
 				const ip = context.request.headers.get('CF-Connecting-IP');
 				if (ip) form.append('remoteip', ip);
