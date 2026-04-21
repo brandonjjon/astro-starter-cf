@@ -1,3 +1,5 @@
+import { EventEmitter } from 'node:events';
+
 import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
@@ -5,6 +7,11 @@ import { defineConfig, envField, fontProviders } from 'astro/config';
 import icon from 'astro-icon';
 
 import tailwindcss from '@tailwindcss/vite';
+
+// Vite + Astro + @cloudflare/vite-plugin all register chokidar watchers on the
+// same FSWatcher. Their cumulative listener count exceeds Node's default of 10.
+// Not a real leak — bump the ceiling to silence the dev-time warning.
+EventEmitter.defaultMaxListeners = 20;
 
 // Skip the CF adapter under vitest — its vite plugin conflicts with vitest's
 // Node-based SSR resolution.
