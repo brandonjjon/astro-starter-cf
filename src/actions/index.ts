@@ -1,5 +1,5 @@
 import { defineAction, ActionError } from 'astro:actions';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import {
 	CONTACT_FROM_EMAIL,
 	CONTACT_TO_EMAIL,
@@ -11,7 +11,7 @@ export const server = {
 		accept: 'form',
 		input: z.object({
 			name: z.string().min(1).max(200),
-			email: z.string().email().max(200),
+			email: z.email().max(200),
 			message: z.string().min(10).max(5000),
 			'cf-turnstile-response': z.string().optional(),
 		}),

@@ -18,6 +18,7 @@ export default defineConfig({
 				imageService: 'compile',
 				prerenderEnvironment: 'node',
 				configPath: './wrangler.jsonc',
+				inspectorPort: false,
 			}),
 	integrations: [sitemap(), mdx(), icon()],
 
