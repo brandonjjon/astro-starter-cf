@@ -19,23 +19,11 @@
 	"observability": {
 		"enabled": true,
 	},
-	// Plaintext env vars — Workers Builds forwards these to build + runtime.
-	// The Deploy-to-CF button prompts for any value here, using descriptions
-	// from package.json `cloudflare.bindings`.
-	//
-	// SITE_URL is intentionally omitted: you don't know your workers.dev URL
-	// until after first deploy. Add it here (or as a Workers Builds Build
-	// variable) once you do — astro.config.ts reads it via process.env, and
-	// the next build will bake correct sitemap + canonical URLs.
-	"vars": {
-		"CONTACT_TO_EMAIL": "brandon@blackdogmade.com",
-		"CONTACT_FROM_EMAIL": "noreply@example.com",
-	},
-	// Preserve runtime vars set via the Cloudflare dashboard across deploys.
-	// Without this, every `wrangler deploy` resets vars to the values above,
-	// clobbering edits you make in Worker → Settings → Variables. Defaults
-	// above are only applied on the first deploy (or if you remove them from
-	// the dashboard).
+	// Preserve runtime vars across deploys so dashboard edits stick. Email +
+	// Turnstile values live in .dev.vars.example so they're stored as runtime
+	// secrets — wrangler deploy never touches them, regardless of keep_vars.
+	// Add plaintext vars here (like SITE_URL) only when you want them baked
+	// into both build env and runtime.
 	"keep_vars": true,
 	// Cloudflare Email Sending binding (https://developers.cloudflare.com/email-service).
 	// Prereq: your domain must be onboarded + verified in Dashboard → Email → Email Sending.
