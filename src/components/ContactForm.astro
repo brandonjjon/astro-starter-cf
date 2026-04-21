@@ -65,30 +65,27 @@ const siteKey = isWorkersDevHost ? TEST_SITE_KEY : PUBLIC_TURNSTILE_SITE_KEY;
 	{result?.error && <p class="text-sm text-red-700">{result.error.message}</p>}
 </form>
 
-{
-	siteKey && (
-		<script
-			is:inline
-			set:html={`(() => {
-  // Lazy-load Turnstile on first form interaction. Loading eagerly causes a
-  // "preload not used" console warning because api.js preloads its challenge
-  // script and the browser expects it to be consumed within a few seconds of
-  // the page load event.
-  let loaded = false;
-  const load = () => {
-    if (loaded) return;
-    loaded = true;
-    const s = document.createElement('script');
-    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    s.async = true;
-    s.defer = true;
-    document.head.appendChild(s);
-  };
-  const form = document.querySelector('form');
-  if (!form) return;
-  form.addEventListener('focusin', load, { once: true });
-  form.addEventListener('pointerdown', load, { once: true });
-})();`}
-		/>
-	)
-}
+<script>
+	// Lazy-load Turnstile on first form interaction. Loading eagerly causes a
+	// "preload not used" console warning because api.js preloads its challenge
+	// script and the browser expects it to be used within a few seconds of
+	// page load. No-op when the widget isn't rendered (no siteKey → no
+	// .cf-turnstile in DOM). Bundled by Astro, so `script-src 'self'` covers
+	// it — no CSP hash needed.
+	const form = document.querySelector('form');
+	const turnstileDiv = document.querySelector('.cf-turnstile');
+	if (form && turnstileDiv) {
+		let loaded = false;
+		const load = () => {
+			if (loaded) return;
+			loaded = true;
+			const s = document.createElement('script');
+			s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+			s.async = true;
+			s.defer = true;
+			document.head.appendChild(s);
+		};
+		form.addEventListener('focusin', load, { once: true });
+		form.addEventListener('pointerdown', load, { once: true });
+	}
+</script>
