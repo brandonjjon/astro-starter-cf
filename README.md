@@ -1,6 +1,6 @@
 # astro-starter-cf
 
-Opinionated GitHub template for marketing sites on **Astro + Cloudflare Pages**. Click **Use this template** on GitHub, clone, configure, deploy.
+Opinionated GitHub template for marketing sites on **Astro + Cloudflare Workers** (static-first, with one on-demand route for the contact form). Click **Use this template** on GitHub, clone, configure, deploy.
 
 ## Quickstart
 
@@ -21,7 +21,8 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
 
 ## Features
 
-- **Astro 6** with `@astrojs/cloudflare` adapter (static + on-demand rendering)
+- **Astro 6** with `@astrojs/cloudflare` adapter v13 (static by default, `/contact` is on-demand)
+- **Cloudflare Workers** deploy with static-assets binding, observability, strict-public fetch
 - **Tailwind v4** (CSS-first `@theme` tokens)
 - **Inter** via Astro Fonts API (self-hosted, preloaded)
 - **MDX** + content collections ready (`src/content/posts/`)
@@ -38,40 +39,42 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
 - **Lefthook** — pre-commit (prettier/eslint/gitleaks), pre-push (check/test), commit-msg (commitlint)
 - **Vitest** unit + **Playwright** E2E + **axe-core** a11y + **Lighthouse CI**
 - **Renovate** with `minimumReleaseAge: 7 days`
-- **GitHub Actions** — CI (lint/type/test/build) + Lighthouse on PRs
+- **GitHub Actions** — CI (lint/type/test/build) + Lighthouse on PRs + auto-deploy to Workers on `main`
 - **mise** pins Bun + gitleaks per project
 
 ## Scripts
 
-| Command             | What                                 |
-| ------------------- | ------------------------------------ |
-| `bun run dev`       | Astro dev server                     |
-| `bun run cf:dev`    | `wrangler pages dev` (binding-aware) |
-| `bun run build`     | `astro check` + build                |
-| `bun run preview`   | Serve built site                     |
-| `bun run check`     | Typecheck `.astro` + `.ts`           |
-| `bun run lint`      | ESLint                               |
-| `bun run format`    | Prettier write                       |
-| `bun run test`      | Vitest                               |
-| `bun run test:e2e`  | Playwright + axe                     |
-| `bun run lhci`      | Lighthouse CI                        |
-| `bun run cf:deploy` | `wrangler pages deploy dist`         |
+| Command             | What                                                             |
+| ------------------- | ---------------------------------------------------------------- |
+| `bun run dev`       | Astro dev server (HMR, bindings via `platformProxy`) — daily use |
+| `bun run build`     | `astro check` + build                                            |
+| `bun run preview`   | `astro preview` — runs built site on workerd (adapter v13)       |
+| `bun run check`     | Typecheck `.astro` + `.ts`                                       |
+| `bun run types`     | Regenerate `worker-configuration.d.ts` from `wrangler.jsonc`     |
+| `bun run lint`      | ESLint                                                           |
+| `bun run format`    | Prettier write                                                   |
+| `bun run test`      | Vitest                                                           |
+| `bun run test:e2e`  | Playwright + axe                                                 |
+| `bun run lhci`      | Lighthouse CI                                                    |
+| `bun run cf:deploy` | `wrangler deploy` — manual deploy (CI handles the usual case)    |
 
 ## Configure for your project
 
 1. **Branding** — edit `src/consts.ts` (`SITE_TITLE`, `SITE_URL`, etc.) and `src/pages/index.astro` copy
 2. **Domain** — set `site:` in `astro.config.ts` to your real URL
 3. **Cloudflare**
-   - Push repo → Cloudflare Pages connect
    - Enable **Email Routing** on your domain; verify destination address
    - Set `destination_address` in `wrangler.jsonc` → your verified address
-   - Set `name:` in `wrangler.jsonc` + `package.json` to match your Pages project
-4. **Env vars** (Pages dashboard + local `.dev.vars`)
-   - `PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` — anti-spam (optional)
-   - `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
-   - Secrets via `wrangler pages secret put TURNSTILE_SECRET_KEY`
-5. **OG image** — drop `public/og.png` (1200×630)
-6. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
+   - Set `name:` in `wrangler.jsonc` + `package.json` to match your Workers name
+4. **Env vars**
+   - Local dev: copy `.dev.vars.example` → `.dev.vars` (auto-loaded by `astro dev` and `wrangler dev`)
+   - Production non-secrets: add to `wrangler.jsonc` `vars` block or set via dashboard
+   - Production secrets: `wrangler secret put TURNSTILE_SECRET_KEY` (prompts, stores encrypted)
+5. **GitHub Actions auto-deploy** — push to `main` triggers `.github/workflows/deploy.yml`. Add two repo secrets:
+   - `CLOUDFLARE_API_TOKEN` — Dashboard → My Profile → API Tokens → _Edit Cloudflare Workers_ template
+   - `CLOUDFLARE_ACCOUNT_ID` — Dashboard → Workers & Pages → right sidebar
+6. **OG image** — drop `public/og.png` (1200×630)
+7. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
 
 ## Project structure
 
@@ -85,10 +88,33 @@ src/
   styles/          # global.css (Tailwind v4 + @theme)
   consts.ts        # site-wide strings
 public/
-  _headers         # Cloudflare security headers
+  _headers         # Security headers (applies to static assets; SSR routes covered by CSP meta)
+worker-configuration.d.ts  # Generated by `bun run types` from wrangler.jsonc bindings
 tests/e2e/         # Playwright + axe
 test/              # Vitest
 ```
+
+## Static-first architecture
+
+`output: 'static'` is the default. Every route prerenders to HTML at build time unless it opts out with `export const prerender = false`. Prerendered routes are served as static assets from Cloudflare's edge (free, no Worker invocation). The Worker only runs for opted-out routes.
+
+Current routes:
+
+| Route         | Mode        | Why                        |
+| ------------- | ----------- | -------------------------- |
+| `/`           | prerendered | static content             |
+| `/404`        | prerendered | served on unmatched routes |
+| `/robots.txt` | prerendered | static                     |
+| `/contact`    | SSR         | Action handles form POST   |
+
+Adapter v13 binding access (inside the action/route):
+
+```ts
+const { env } = await import('cloudflare:workers');
+await env.SEB.send(email);
+```
+
+Typed via generated `Env` in `worker-configuration.d.ts` — run `bun run types` after editing `wrangler.jsonc` bindings.
 
 ## Adding features later
 
