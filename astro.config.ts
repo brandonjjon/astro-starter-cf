@@ -22,10 +22,17 @@ EventEmitter.defaultMaxListeners = 20;
 // Node-based SSR resolution.
 const isTest = !!process.env.VITEST;
 
-// Set SITE_URL in Workers Builds → Build variables (not Runtime vars) so the
-// sitemap, canonical links, and og:url resolve to your real origin. Astro
-// reads `site:` at build time — runtime env is too late.
+// Astro reads `site:` at build time — runtime env is too late. Set SITE_URL
+// either in wrangler.jsonc `vars` or Workers Builds → Build variables and
+// secrets (both are forwarded to the build step). Until then, canonical and
+// sitemap URLs use the placeholder below.
 const SITE_URL = process.env.SITE_URL ?? 'https://example.com';
+
+// Preview deploys (non-main branches) get a unique workers.dev version URL
+// that shouldn't be indexed. Detect via Workers Builds' auto-injected branch
+// env var; BaseHead renders a `noindex` meta and robots.txt blocks all crawlers.
+const WORKERS_CI_BRANCH = process.env.WORKERS_CI_BRANCH ?? '';
+const IS_PREVIEW = WORKERS_CI_BRANCH !== '' && WORKERS_CI_BRANCH !== 'main';
 
 export default defineConfig({
 	site: SITE_URL,
@@ -145,6 +152,12 @@ export default defineConfig({
 
 	vite: {
 		plugins: [tailwindcss()],
+		define: {
+			// Baked at build into every module — readable from .astro frontmatter
+			// and .ts endpoints via `import.meta.env.IS_PREVIEW`. Works for both
+			// prerendered pages and SSR routes.
+			'import.meta.env.IS_PREVIEW': JSON.stringify(IS_PREVIEW),
+		},
 		ssr: {
 			// Astro internals are late-discovered and trip SSR optimizer mid-session.
 			// Pre-including keeps them in the initial bundle and avoids HMR reload churn.
