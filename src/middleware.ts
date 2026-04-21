@@ -12,10 +12,17 @@ const SECURITY_HEADERS: Record<string, string> = {
 	'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
 };
 
-export const onRequest = defineMiddleware(async (_context, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
 	const response = await next();
 	for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
 		if (!response.headers.has(key)) response.headers.set(key, value);
+	}
+	// Discourage indexing of *.workers.dev URLs — they're preview/test origins,
+	// not production. Custom domains get indexed normally. Header equivalent of
+	// <meta name="robots" content="noindex, nofollow"> but applied at response
+	// level so it works for every SSR route without touching BaseHead.
+	if (context.url.hostname.endsWith('.workers.dev')) {
+		response.headers.set('X-Robots-Tag', 'noindex, nofollow');
 	}
 	return response;
 });
