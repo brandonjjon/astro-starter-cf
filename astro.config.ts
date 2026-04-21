@@ -22,8 +22,13 @@ EventEmitter.defaultMaxListeners = 20;
 // Node-based SSR resolution.
 const isTest = !!process.env.VITEST;
 
+// Set SITE_URL in Workers Builds → Build variables (not Runtime vars) so the
+// sitemap, canonical links, and og:url resolve to your real origin. Astro
+// reads `site:` at build time — runtime env is too late.
+const SITE_URL = process.env.SITE_URL ?? 'https://example.com';
+
 export default defineConfig({
-	site: 'https://example.com',
+	site: SITE_URL,
 	adapter: isTest
 		? undefined
 		: cloudflare({
@@ -100,8 +105,11 @@ export default defineConfig({
 
 	env: {
 		schema: {
+			// Read server-side so Workers Builds runtime vars work — avoids the
+			// build-vs-runtime env split that breaks client-context PUBLIC_* vars.
+			// Rendered into an HTML `data-sitekey` attribute, so still public.
 			PUBLIC_TURNSTILE_SITE_KEY: envField.string({
-				context: 'client',
+				context: 'server',
 				access: 'public',
 				optional: true,
 				default: '',

@@ -75,20 +75,19 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
 
 ## Configure for your project
 
-1. **Branding** — edit `src/consts.ts` (`SITE_TITLE`, `SITE_URL`, etc.) and `src/pages/index.astro` copy
-2. **Domain** — set `site:` in `astro.config.ts` to your real URL
-3. **Cloudflare**
+1. **Branding** — edit `src/consts.ts` (`SITE_TITLE`, etc.) and `src/pages/index.astro` copy
+2. **Cloudflare**
    - Onboard your domain to **Email Sending** (Dashboard → Email → Email Sending → Add domain, then publish the SPF/DKIM records it gives you)
    - Optional: set `allowed_sender_addresses` in `wrangler.jsonc` to lock which From addresses this Worker may use
    - Set `name:` in `wrangler.jsonc` + `package.json` to match your Workers name
-4. **Env vars**
-   - Local dev: copy `.dev.vars.example` → `.dev.vars` (auto-loaded by `astro dev` and `wrangler dev`)
-   - Production non-secrets: add to `wrangler.jsonc` `vars` block or set via dashboard
-   - Production secrets: `wrangler secret put TURNSTILE_SECRET_KEY` (prompts, stores encrypted)
-5. **Deploy** — if you used the button, already done. Otherwise: CF Dashboard → Workers & Pages → Create → Import a repository → pick your repo → Save. Auto-deploys on every push to `main` thereafter.
-6. **Branch protection (recommended)** — Settings → Branches → Add rule → `main` → require `CI / check` status to pass before merge. Gates Workers Builds on green CI.
-7. **OG image** — drop `public/og.png` (1200×630)
-8. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
+3. **Env vars** — two distinct scopes in Workers Builds:
+   - **Runtime vars** (Worker → Settings → Variables or the Deploy-to-CF form): `TURNSTILE_SECRET_KEY`, `PUBLIC_TURNSTILE_SITE_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`. Read at request time.
+   - **Build vars** (Workers Builds → Settings → Build variables and secrets): `SITE_URL` only. Astro reads it when generating the sitemap + canonical URLs at build time — setting it as runtime won't work. Set to your real origin (e.g. `https://yourdomain.com` or `https://your-worker.workers.dev`).
+   - **Local dev**: copy `.dev.vars.example` → `.dev.vars` — auto-loaded by `astro dev` and `wrangler dev`.
+4. **Deploy** — if you used the button, already done. Otherwise: CF Dashboard → Workers & Pages → Create → Import a repository → pick your repo → Save. Auto-deploys on every push to `main` thereafter.
+5. **Branch protection (recommended)** — Settings → Branches → Add rule → `main` → require `CI / check` status to pass before merge. Gates Workers Builds on green CI.
+6. **OG image** — drop `public/og.png` (1200×630)
+7. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
 
 ## Project structure
 
