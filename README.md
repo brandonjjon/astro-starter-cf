@@ -4,18 +4,18 @@ Opinionated GitHub template for marketing sites on **Astro + Cloudflare Workers*
 
 ## Get Started
 
-> [!IMPORTANT]
-> The contact form uses Cloudflare's [`send_email` binding](https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/), which requires [Email Routing](https://developers.cloudflare.com/email-routing/) enabled on your zone with a verified destination address. Set `destination_address` in `wrangler.jsonc` accordingly, or comment out the `send_email` block + `/contact` route if you don't need the form.
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/brandonjjon/astro-starter-cf)
+
+Clicking the button forks the template into your GitHub account, provisions the Worker + KV namespace on Cloudflare, and wires auto-deploy on every push to `main`. Secrets (e.g. `TURNSTILE_SECRET_KEY`) are prompted from `.dev.vars.example`.
+
+Or scaffold locally without a deploy:
 
 ```sh
 npm create astro@latest -- --template brandonjjon/astro-starter-cf
 ```
 
-Or deploy directly to your Cloudflare account:
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/brandonjjon/astro-starter-cf)
-
-The deploy flow clones the repo into your GitHub account, provisions the Worker and KV namespace on Cloudflare, and prompts for any secrets declared in `.dev.vars.example`.
+> [!IMPORTANT]
+> The contact form uses Cloudflare's [`send_email` binding](https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/), which requires [Email Routing](https://developers.cloudflare.com/email-routing/) on your zone with a verified destination. Set `destination_address` in `wrangler.jsonc` after deploy, or remove the `send_email` block + `/contact` route if you don't need the form.
 
 ## Local development
 
@@ -85,8 +85,8 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
    - Local dev: copy `.dev.vars.example` → `.dev.vars` (auto-loaded by `astro dev` and `wrangler dev`)
    - Production non-secrets: add to `wrangler.jsonc` `vars` block or set via dashboard
    - Production secrets: `wrangler secret put TURNSTILE_SECRET_KEY` (prompts, stores encrypted)
-5. **Deploy** — either click the [Deploy to Cloudflare](#get-started) button (clones + auto-configures Workers Builds), or for an existing repo: **CF Dashboard → Workers & Pages → Create → Import a repository → pick your repo → Save and Deploy**. CF autodetects Astro + bun.lock, runs `bun run build`, then `wrangler deploy`. Every push to `main` afterwards auto-deploys.
-6. **Branch protection (recommended)** — require CI (`lint/check/test/build`) to pass on `main` before Workers Builds deploys. Settings → Branches → Add rule → `main` → _Require status checks to pass_ → select `CI / check`.
+5. **Deploy** — if you used the button, already done. Otherwise: CF Dashboard → Workers & Pages → Create → Import a repository → pick your repo → Save. Auto-deploys on every push to `main` thereafter.
+6. **Branch protection (recommended)** — Settings → Branches → Add rule → `main` → require `CI / check` status to pass before merge. Gates Workers Builds on green CI.
 7. **OG image** — drop `public/og.png` (1200×630)
 8. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
 
