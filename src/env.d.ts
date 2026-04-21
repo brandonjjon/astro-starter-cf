@@ -1,11 +1,7 @@
 /// <reference types="astro/client" />
 
-type Runtime = import('@astrojs/cloudflare').Runtime<{
-	SEB: {
-		send: (message: unknown) => Promise<void>;
-	};
-}>;
-
+// `Env` interface is provided globally by worker-configuration.d.ts (see tsconfig include).
+// Adapter v13: `Astro.locals.runtime` removed. Bindings via `import { env } from 'cloudflare:workers'`.
 declare namespace App {
-	type Locals = Runtime;
+	type Locals = import('@astrojs/cloudflare').Runtime;
 }

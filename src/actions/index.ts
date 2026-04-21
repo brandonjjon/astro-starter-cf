@@ -16,14 +16,6 @@ export const server = {
 			'cf-turnstile-response': z.string().optional(),
 		}),
 		handler: async (input, context) => {
-			const runtime = (
-				context.locals as {
-					runtime?: {
-						env: { SEB: { send: (msg: unknown) => Promise<void> } };
-					};
-				}
-			).runtime;
-
 			if (TURNSTILE_SECRET_KEY) {
 				const token = input['cf-turnstile-response'];
 				if (!token) {
@@ -52,6 +44,7 @@ export const server = {
 
 			const { createMimeMessage } = await import('mimetext');
 			const { EmailMessage } = await import('cloudflare:email');
+			const { env } = await import('cloudflare:workers');
 
 			const msg = createMimeMessage();
 			msg.setSender({ name: 'Website', addr: CONTACT_FROM_EMAIL });
@@ -68,13 +61,7 @@ export const server = {
 				msg.asRaw(),
 			);
 
-			if (!runtime?.env?.SEB) {
-				throw new ActionError({
-					code: 'INTERNAL_SERVER_ERROR',
-					message: 'Email binding unavailable',
-				});
-			}
-			await runtime.env.SEB.send(email);
+			await env.SEB.send(email);
 			return { ok: true };
 		},
 	}),
