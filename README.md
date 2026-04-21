@@ -27,7 +27,6 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
 - **MDX** + content collections ready (`src/content/posts/`)
 - **astro-icon** drop SVGs into `src/icons/`
 - **Sitemap** + **JSON-LD** (Organization + WebSite)
-- **View Transitions** via browser-native `@view-transition` CSS (Chrome/Edge 126+, Safari 18+; graceful degrade)
 - **Contact form** — Astro Action → Cloudflare `send_email` binding
 - **Cloudflare Turnstile** anti-spam (env-gated)
 - **Analytics-agnostic** — no vendor baked in. Use Cloudflare Zaraz (edge-loaded, zero code), Plausible, Umami, GA4, etc. — configure in CF dashboard or add a small component
