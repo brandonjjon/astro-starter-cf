@@ -53,9 +53,16 @@ export const server = {
 
 			const { env } = await import('cloudflare:workers');
 
+			// Fallbacks for first-deploy before dashboard values are set. The
+			// real values must come from Worker runtime env (dashboard edit);
+			// schema is `access: 'secret'` so Astro reads them per-request
+			// instead of baking defaults as build-time constants.
+			const from = CONTACT_FROM_EMAIL ?? 'noreply@example.com';
+			const to = CONTACT_TO_EMAIL ?? 'hello@example.com';
+
 			await env.EMAIL.send({
-				from: { email: CONTACT_FROM_EMAIL, name: 'Website' },
-				to: CONTACT_TO_EMAIL,
+				from: { email: from, name: 'Website' },
+				to,
 				replyTo: input.email,
 				subject: `Contact form — ${input.name}`,
 				text: `From: ${input.name} <${input.email}>\n\n${input.message}`,

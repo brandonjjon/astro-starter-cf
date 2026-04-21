@@ -28,12 +28,6 @@ const isTest = !!process.env.VITEST;
 // sitemap URLs use the placeholder below.
 const SITE_URL = process.env.SITE_URL ?? 'https://example.com';
 
-// Preview deploys (non-main branches) get a unique workers.dev version URL
-// that shouldn't be indexed. Detect via Workers Builds' auto-injected branch
-// env var; BaseHead renders a `noindex` meta and robots.txt blocks all crawlers.
-const WORKERS_CI_BRANCH = process.env.WORKERS_CI_BRANCH ?? '';
-const IS_PREVIEW = WORKERS_CI_BRANCH !== '' && WORKERS_CI_BRANCH !== 'main';
-
 export default defineConfig({
 	site: SITE_URL,
 	adapter: isTest
@@ -113,14 +107,16 @@ export default defineConfig({
 
 	env: {
 		schema: {
-			// Read server-side so Workers Builds runtime vars work — avoids the
-			// build-vs-runtime env split that breaks client-context PUBLIC_* vars.
-			// Rendered into an HTML `data-sitekey` attribute, so still public.
+			// All marked `access: 'secret'` so Astro compiles them as runtime env
+			// lookups (`_internalGetSecret`) instead of build-time constants.
+			// `access: 'public'` bakes the default into the bundle as a frozen
+			// `const`, so any dashboard edit is silently ignored at runtime. The
+			// `PUBLIC_` name on the site key is kept for continuity — values only
+			// reach HTML via server-rendered attributes, never client JS.
 			PUBLIC_TURNSTILE_SITE_KEY: envField.string({
 				context: 'server',
-				access: 'public',
+				access: 'secret',
 				optional: true,
-				default: '',
 			}),
 			TURNSTILE_SECRET_KEY: envField.string({
 				context: 'server',
@@ -129,13 +125,13 @@ export default defineConfig({
 			}),
 			CONTACT_TO_EMAIL: envField.string({
 				context: 'server',
-				access: 'public',
-				default: 'hello@example.com',
+				access: 'secret',
+				optional: true,
 			}),
 			CONTACT_FROM_EMAIL: envField.string({
 				context: 'server',
-				access: 'public',
-				default: 'noreply@example.com',
+				access: 'secret',
+				optional: true,
 			}),
 		},
 	},
@@ -153,12 +149,6 @@ export default defineConfig({
 
 	vite: {
 		plugins: [tailwindcss()],
-		define: {
-			// Baked at build into every module — readable from .astro frontmatter
-			// and .ts endpoints via `import.meta.env.IS_PREVIEW`. Works for both
-			// prerendered pages and SSR routes.
-			'import.meta.env.IS_PREVIEW': JSON.stringify(IS_PREVIEW),
-		},
 		ssr: {
 			// Astro internals are late-discovered and trip SSR optimizer mid-session.
 			// Pre-including keeps them in the initial bundle and avoids HMR reload churn.
