@@ -1,0 +1,55 @@
+{
+	"name": "astro-starter-cf",
+	"private": true,
+	"type": "module",
+	"version": "0.0.1",
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro check && astro build",
+		"preview": "astro preview",
+		"check": "astro check",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"lint": "eslint .",
+		"test": "vitest run",
+		"test:e2e": "playwright test",
+		"cf:dev": "wrangler pages dev",
+		"cf:deploy": "wrangler pages deploy dist",
+		"lhci": "lhci autorun",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "13.1.9",
+		"@astrojs/mdx": "^5.0.3",
+		"@astrojs/sitemap": "^3.7.2",
+		"@tailwindcss/vite": "4.2.2",
+		"astro": "6.1.6",
+		"astro-icon": "^1.1.5",
+		"mimetext": "^3.0.27",
+		"tailwindcss": "4.2.2"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.8",
+		"@axe-core/playwright": "^4.10.0",
+		"@cloudflare/workers-types": "^4.20260414.1",
+		"@commitlint/cli": "^20.5.0",
+		"@commitlint/config-conventional": "^20.5.0",
+		"@eslint/js": "^10.0.1",
+		"@lhci/cli": "^0.15.0",
+		"@playwright/test": "^1.50.0",
+		"@typescript-eslint/eslint-plugin": "^8.58.2",
+		"@typescript-eslint/parser": "^8.58.2",
+		"astro-eslint-parser": "^1.4.0",
+		"eslint": "^10.2.0",
+		"eslint-plugin-astro": "^1.7.0",
+		"globals": "^17.5.0",
+		"lefthook": "^2.1.5",
+		"prettier": "^3.8.2",
+		"prettier-plugin-astro": "^0.14.1",
+		"typescript": "^5.9.0",
+		"vitest": "^4.1.0"
+	}
+}

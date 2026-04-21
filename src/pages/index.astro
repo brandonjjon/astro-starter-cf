@@ -1,0 +1,90 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import ContactForm from '../components/ContactForm.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body class="bg-white text-neutral-900">
+		<Header />
+		<main>
+			<section class="mx-auto max-w-5xl px-4 py-24 text-center">
+				<h1 class="text-5xl font-bold tracking-tight">Your headline here</h1>
+				<p class="mx-auto mt-4 max-w-2xl text-lg text-neutral-600">
+					A short pitch describing what you do. Replace this copy in
+					<code>src/pages/index.astro</code>.
+				</p>
+				<div class="mt-8 flex justify-center gap-3">
+					<a
+						href="#contact"
+						class="rounded bg-black px-5 py-2.5 text-white hover:bg-black/80"
+					>
+						Get in touch
+					</a>
+					<a
+						href="#features"
+						class="rounded border border-black/20 px-5 py-2.5 hover:bg-black/5"
+					>
+						Learn more
+					</a>
+				</div>
+			</section>
+
+			<section id="features" class="mx-auto max-w-5xl px-4 py-16">
+				<h2 class="text-3xl font-semibold">Features</h2>
+				<div class="mt-8 grid gap-6 md:grid-cols-3">
+					<article class="rounded-lg border border-black/10 p-6">
+						<h3 class="text-lg font-semibold">Feature one</h3>
+						<p class="mt-2 text-sm text-neutral-600">
+							Describe a core capability. Keep it tight — one or two sentences.
+						</p>
+					</article>
+					<article class="rounded-lg border border-black/10 p-6">
+						<h3 class="text-lg font-semibold">Feature two</h3>
+						<p class="mt-2 text-sm text-neutral-600">
+							Describe a core capability. Keep it tight — one or two sentences.
+						</p>
+					</article>
+					<article class="rounded-lg border border-black/10 p-6">
+						<h3 class="text-lg font-semibold">Feature three</h3>
+						<p class="mt-2 text-sm text-neutral-600">
+							Describe a core capability. Keep it tight — one or two sentences.
+						</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="bg-neutral-50">
+				<div class="mx-auto max-w-5xl px-4 py-16 text-center">
+					<h2 class="text-3xl font-semibold">Ready to start?</h2>
+					<p class="mx-auto mt-3 max-w-xl text-neutral-600">
+						One more line to close the pitch before the CTA.
+					</p>
+					<a
+						href="#contact"
+						class="mt-6 inline-block rounded bg-black px-5 py-2.5 text-white hover:bg-black/80"
+					>
+						Contact us
+					</a>
+				</div>
+			</section>
+
+			<section id="contact" class="mx-auto max-w-5xl px-4 py-16">
+				<h2 class="text-3xl font-semibold text-center">Contact</h2>
+				<p class="mt-2 text-center text-neutral-600">
+					Send us a message and we'll get back to you.
+				</p>
+				<div class="mt-8">
+					<ContactForm />
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

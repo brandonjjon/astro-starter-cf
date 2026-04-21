@@ -1,0 +1,31 @@
+---
+import { PUBLIC_GA_MEASUREMENT_ID } from 'astro:env/client';
+const id = PUBLIC_GA_MEASUREMENT_ID;
+const inline = `
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){ dataLayer.push(arguments); }
+	window.gtag = gtag;
+	gtag('js', new Date());
+	gtag('config', id, { send_page_view: false });
+	const sendPageView = () => gtag('event', 'page_view', {
+		page_path: location.pathname + location.search,
+		page_title: document.title,
+		page_location: location.href,
+	});
+	sendPageView();
+	document.addEventListener('astro:page-load', sendPageView);
+`;
+---
+
+{
+	id && (
+		<>
+			<script
+				is:inline
+				async
+				src={`https://www.googletagmanager.com/gtag/js?id=${id}`}
+			/>
+			<script is:inline define:vars={{ id }} set:html={inline} />
+		</>
+	)
+}

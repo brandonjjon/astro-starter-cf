@@ -1,0 +1,12 @@
+{
+	"name": "astro-starter-cf",
+	"compatibility_date": "2026-04-10",
+	"compatibility_flags": ["nodejs_compat"],
+	// TODO: set destination_address to a verified address in your CF Email Routing
+	"send_email": [
+		{
+			"name": "SEB",
+			"destination_address": "hello@example.com",
+		},
+	],
+}

@@ -1,0 +1,31 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: prettier
+      glob: '*.{astro,ts,tsx,js,jsx,mjs,cjs,md,mdx,json,jsonc,css,yml,yaml}'
+      run: bunx prettier --write {staged_files}
+      stage_fixed: true
+    - name: eslint
+      glob: '*.{astro,ts,tsx,js,jsx,mjs,cjs}'
+      run: bunx eslint --fix {staged_files}
+      stage_fixed: true
+    - name: gitleaks
+      run: |
+        if command -v gitleaks >/dev/null 2>&1; then
+          gitleaks protect --staged --redact --no-banner
+        else
+          echo "gitleaks not installed — skipping. Install: brew install gitleaks"
+        fi
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: astro-check
+      run: bun run check
+    - name: test
+      run: bun run test
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: bunx commitlint --edit {1}

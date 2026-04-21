@@ -1,0 +1,25 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended", ":dependencyDashboard"],
+	"schedule": ["before 6am on monday"],
+	"minimumReleaseAge": "7 days",
+	"prHourlyLimit": 4,
+	"prConcurrentLimit": 10,
+	"packageRules": [
+		{
+			"matchPackagePatterns": ["^astro", "^@astrojs/"],
+			"groupName": "astro"
+		},
+		{
+			"matchDepTypes": ["devDependencies"],
+			"groupName": "dev dependencies",
+			"automerge": true,
+			"automergeType": "pr",
+			"matchUpdateTypes": ["minor", "patch"]
+		},
+		{
+			"matchManagers": ["github-actions"],
+			"groupName": "github actions"
+		}
+	]
+}

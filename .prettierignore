@@ -1,0 +1,9 @@
+dist/
+.astro/
+node_modules/
+.wrangler/
+.lighthouseci/
+playwright-report/
+test-results/
+bun.lock
+package-lock.json

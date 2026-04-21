@@ -1,0 +1,71 @@
+---
+import { actions } from 'astro:actions';
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+
+const result = Astro.getActionResult(actions.submitContact);
+---
+
+<form
+	method="POST"
+	action={actions.submitContact}
+	class="mx-auto flex max-w-md flex-col gap-4"
+>
+	<label class="flex flex-col gap-1 text-sm">
+		Name
+		<input
+			type="text"
+			name="name"
+			required
+			maxlength="200"
+			class="rounded border border-black/20 px-3 py-2"
+		/>
+	</label>
+	<label class="flex flex-col gap-1 text-sm">
+		Email
+		<input
+			type="email"
+			name="email"
+			required
+			maxlength="200"
+			class="rounded border border-black/20 px-3 py-2"
+		/>
+	</label>
+	<label class="flex flex-col gap-1 text-sm">
+		Message
+		<textarea
+			name="message"
+			required
+			minlength="10"
+			maxlength="5000"
+			rows="5"
+			class="rounded border border-black/20 px-3 py-2"></textarea>
+	</label>
+	{
+		PUBLIC_TURNSTILE_SITE_KEY && (
+			<div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} />
+		)
+	}
+	<button
+		type="submit"
+		class="rounded bg-black px-4 py-2 text-white hover:bg-black/80"
+	>
+		Send
+	</button>
+	{
+		result?.data?.ok && (
+			<p class="text-sm text-green-700">Thanks — we'll be in touch.</p>
+		)
+	}
+	{result?.error && <p class="text-sm text-red-700">{result.error.message}</p>}
+</form>
+
+{
+	PUBLIC_TURNSTILE_SITE_KEY && (
+		<script
+			is:inline
+			src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+			async
+			defer
+		/>
+	)
+}
