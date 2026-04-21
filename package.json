@@ -52,9 +52,6 @@
 	},
 	"cloudflare": {
 		"bindings": {
-			"SITE_URL": {
-				"description": "Your public site origin (e.g. `https://example.com` or `https://your-worker.workers.dev`). Used at build time for canonical links, og:url, and sitemap URLs. Set to your Workers dev subdomain if you don't have a custom domain yet — you can change it later in Worker → Settings → Variables (re-deploy to regenerate the sitemap)."
-			},
 			"CONTACT_TO_EMAIL": {
 				"description": "Inbox that receives contact-form submissions. Any address — it doesn't need to be on your domain."
 			},

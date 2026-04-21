@@ -81,13 +81,14 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
    - Optional: set `allowed_sender_addresses` in `wrangler.jsonc` to lock which From addresses this Worker may use
    - Set `name:` in `wrangler.jsonc` + `package.json` to match your Workers name
 3. **Env vars** — the Deploy-to-CF button prompts for all of these up front (descriptions live in `package.json` `cloudflare.bindings`):
-   - Plaintext (in `wrangler.jsonc` `vars`, forwarded to both build + runtime): `SITE_URL`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
-   - Secrets (in `.dev.vars.example`): `TURNSTILE_SECRET_KEY`, `PUBLIC_TURNSTILE_SITE_KEY`
-   - **Local dev**: copy `.dev.vars.example` → `.dev.vars` — auto-loaded by `astro dev` and `wrangler dev`. Plaintext values come from `wrangler.jsonc`.
-4. **Deploy** — if you used the button, already done. Otherwise: CF Dashboard → Workers & Pages → Create → Import a repository → pick your repo → Save. Auto-deploys on every push to `main` thereafter.
-5. **Branch protection (recommended)** — Settings → Branches → Add rule → `main` → require `CI / check` status to pass before merge. Gates Workers Builds on green CI.
-6. **OG image** — drop `public/og.png` (1200×630)
-7. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
+   - Plaintext (`wrangler.jsonc` `vars`, forwarded to build + runtime): `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
+   - Secrets (`.dev.vars.example`): `TURNSTILE_SECRET_KEY`, `PUBLIC_TURNSTILE_SITE_KEY`
+   - **Local dev**: copy `.dev.vars.example` → `.dev.vars` — auto-loaded by `astro dev` and `wrangler dev`.
+4. **Set `SITE_URL` after first deploy** — copy your assigned URL (workers.dev or custom domain) from the Worker overview, then add `"SITE_URL": "https://…"` to `wrangler.jsonc` `vars` and push. The next build regenerates the sitemap + canonical links with the real origin. Skip this step initially; the site works, only sitemap/canonical URLs are placeholder until set.
+5. **Deploy** — if you used the button, already done. Otherwise: CF Dashboard → Workers & Pages → Create → Import a repository → pick your repo → Save. Auto-deploys on every push to `main` thereafter.
+6. **Branch protection (recommended)** — Settings → Branches → Add rule → `main` → require `CI / check` status to pass before merge. Gates Workers Builds on green CI.
+7. **OG image** — drop `public/og.png` (1200×630)
+8. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
 
 ## Project structure
 

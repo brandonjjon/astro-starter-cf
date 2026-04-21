@@ -12,11 +12,15 @@
 	"observability": {
 		"enabled": true,
 	},
-	// Plaintext env vars — Workers Builds forwards these to the build step AND
-	// runtime. The Deploy-to-CF button prompts for any value left empty or
-	// placeholder, using descriptions from package.json `cloudflare.bindings`.
+	// Plaintext env vars — Workers Builds forwards these to build + runtime.
+	// The Deploy-to-CF button prompts for any value here, using descriptions
+	// from package.json `cloudflare.bindings`.
+	//
+	// SITE_URL is intentionally omitted: you don't know your workers.dev URL
+	// until after first deploy. Add it here (or as a Workers Builds Build
+	// variable) once you do — astro.config.ts reads it via process.env, and
+	// the next build will bake correct sitemap + canonical URLs.
 	"vars": {
-		"SITE_URL": "https://example.com",
 		"CONTACT_TO_EMAIL": "hello@example.com",
 		"CONTACT_FROM_EMAIL": "noreply@example.com",
 	},
