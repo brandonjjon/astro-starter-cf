@@ -1,32 +1,32 @@
+// @ts-check
 import js from '@eslint/js';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import astro from 'eslint-plugin-astro';
-import tsParser from '@typescript-eslint/parser';
-import tsPlugin from '@typescript-eslint/eslint-plugin';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default [
-	{ ignores: ['dist/', '.astro/', 'node_modules/'] },
+export default defineConfig(
+	globalIgnores([
+		'dist/',
+		'.astro/',
+		'node_modules/',
+		'worker-configuration.d.ts',
+	]),
 	js.configs.recommended,
+	tseslint.configs.recommended,
+	astro.configs.recommended,
 	{
 		languageOptions: {
 			globals: { ...globals.browser, ...globals.node },
 		},
 	},
 	{
-		files: ['**/*.{ts,tsx}'],
-		languageOptions: {
-			parser: tsParser,
-			parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
-		},
-		plugins: { '@typescript-eslint': tsPlugin },
+		files: ['**/*.{ts,tsx,astro}'],
 		rules: {
-			...tsPlugin.configs.recommended.rules,
-			'no-unused-vars': 'off',
 			'@typescript-eslint/no-unused-vars': [
 				'warn',
 				{ argsIgnorePattern: '^_' },
 			],
 		},
 	},
-	...astro.configs.recommended,
-];
+);
