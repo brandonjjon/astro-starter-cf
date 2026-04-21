@@ -69,9 +69,26 @@ const siteKey = isWorkersDevHost ? TEST_SITE_KEY : PUBLIC_TURNSTILE_SITE_KEY;
 	siteKey && (
 		<script
 			is:inline
-			src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-			async
-			defer
+			set:html={`(() => {
+  // Lazy-load Turnstile on first form interaction. Loading eagerly causes a
+  // "preload not used" console warning because api.js preloads its challenge
+  // script and the browser expects it to be consumed within a few seconds of
+  // the page load event.
+  let loaded = false;
+  const load = () => {
+    if (loaded) return;
+    loaded = true;
+    const s = document.createElement('script');
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    s.async = true;
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  const form = document.querySelector('form');
+  if (!form) return;
+  form.addEventListener('focusin', load, { once: true });
+  form.addEventListener('pointerdown', load, { once: true });
+})();`}
 		/>
 	)
 }
