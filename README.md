@@ -2,15 +2,29 @@
 
 Opinionated GitHub template for marketing sites on **Astro + Cloudflare Workers** (static-first, with one on-demand route for the contact form). Click **Use this template** on GitHub, clone, configure, deploy.
 
-## Quickstart
+## Get Started
+
+> [!IMPORTANT]
+> The contact form uses Cloudflare's [`send_email` binding](https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/), which requires [Email Routing](https://developers.cloudflare.com/email-routing/) enabled on your zone with a verified destination address. Set `destination_address` in `wrangler.jsonc` accordingly, or comment out the `send_email` block + `/contact` route if you don't need the form.
+
+```sh
+npm create astro@latest -- --template brandonjjon/astro-starter-cf
+```
+
+Or deploy directly to your Cloudflare account:
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/brandonjjon/astro-starter-cf)
+
+The deploy flow clones the repo into your GitHub account, provisions the Worker and KV namespace on Cloudflare, and prompts for any secrets declared in `.dev.vars.example`.
+
+## Local development
 
 Prereqs: [`mise`](https://mise.jdx.dev) (`brew install mise`) — pins Bun + gitleaks for this project.
 
-```bash
-# After "Use this template" on GitHub and cloning
+```sh
 cd your-new-site
 mise install          # Bun + gitleaks at pinned versions
-bun install           # deps
+bun install
 bunx lefthook install # git hooks (once per clone)
 bun run dev
 ```
