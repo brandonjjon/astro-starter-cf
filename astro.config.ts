@@ -100,7 +100,8 @@ export default defineConfig({
 				"object-src 'none'",
 				"base-uri 'self'",
 				"form-action 'self'",
-				"frame-ancestors 'none'",
+				// `frame-ancestors` isn't enforced when CSP is delivered via <meta>.
+				// `X-Frame-Options: DENY` in public/_headers covers this for all browsers.
 			],
 			scriptDirective: {
 				// Default is 'self' + Astro hashes; we must re-include 'self' when
