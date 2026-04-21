@@ -1,0 +1,14 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "AI skill docs are documentation examples, not production code"
+paths = [
+	'''^\.agents/skills/.*''',
+	'''^\.augment/skills/.*''',
+	'''^\.claude/skills/.*''',
+	'''^\.codebuddy/skills/.*''',
+	'''^\.continue/skills/.*''',
+	'''^\.junie/skills/.*''',
+	'''^\.kiro/skills/.*''',
+]
