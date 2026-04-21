@@ -29,6 +29,31 @@ export default defineConfig({
 			}),
 	integrations: [sitemap(), mdx(), icon()],
 
+	security: {
+		// Astro auto-generates hashes for bundled scripts/styles and emits a
+		// <meta http-equiv="content-security-policy"> in every page head.
+		// Note: dev server does not emit CSP — use `astro build && astro preview` to verify.
+		csp: {
+			algorithm: 'SHA-256',
+			directives: [
+				"default-src 'self'",
+				"img-src 'self' data: https: blob:",
+				"font-src 'self' data:",
+				"connect-src 'self' https://challenges.cloudflare.com",
+				'frame-src https://challenges.cloudflare.com',
+				"object-src 'none'",
+				"base-uri 'self'",
+				"form-action 'self'",
+				"frame-ancestors 'none'",
+			],
+			scriptDirective: {
+				// Default is 'self' + Astro hashes; we must re-include 'self' when
+				// adding extra sources. Turnstile needed for the contact form widget.
+				resources: ["'self'", 'https://challenges.cloudflare.com'],
+			},
+		},
+	},
+
 	env: {
 		schema: {
 			PUBLIC_TURNSTILE_SITE_KEY: envField.string({

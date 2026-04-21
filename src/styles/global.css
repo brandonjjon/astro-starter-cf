@@ -7,3 +7,10 @@
 body {
 	font-family: var(--font-inter);
 }
+
+/* Browser-native cross-document view transitions (Chrome/Edge 126+, Safari 18+).
+   Replaces Astro's <ClientRouter /> which is incompatible with security.csp.
+   Graceful degrade: browsers without support just do a normal navigation. */
+@view-transition {
+	navigation: auto;
+}

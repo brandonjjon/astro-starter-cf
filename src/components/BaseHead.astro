@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import { Font } from 'astro:assets';
-import { ClientRouter } from 'astro:transitions';
 import { DEFAULT_OG_IMAGE } from '../consts';
 import StructuredData from './StructuredData.astro';
 
@@ -25,7 +24,6 @@ const imageURL = new URL(image, Astro.url);
 <meta name="generator" content={Astro.generator} />
 
 <Font cssVariable="--font-inter" preload />
-<ClientRouter />
 
 <link rel="canonical" href={canonicalURL} />
 
