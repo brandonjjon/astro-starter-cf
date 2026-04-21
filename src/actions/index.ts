@@ -42,26 +42,15 @@ export const server = {
 				}
 			}
 
-			const { createMimeMessage } = await import('mimetext');
-			const { EmailMessage } = await import('cloudflare:email');
 			const { env } = await import('cloudflare:workers');
 
-			const msg = createMimeMessage();
-			msg.setSender({ name: 'Website', addr: CONTACT_FROM_EMAIL });
-			msg.setRecipient(CONTACT_TO_EMAIL);
-			msg.setSubject(`Contact form — ${input.name}`);
-			msg.addMessage({
-				contentType: 'text/plain',
-				data: `From: ${input.name} <${input.email}>\n\n${input.message}`,
+			await env.EMAIL.send({
+				from: { email: CONTACT_FROM_EMAIL, name: 'Website' },
+				to: CONTACT_TO_EMAIL,
+				replyTo: input.email,
+				subject: `Contact form — ${input.name}`,
+				text: `From: ${input.name} <${input.email}>\n\n${input.message}`,
 			});
-
-			const email = new EmailMessage(
-				CONTACT_FROM_EMAIL,
-				CONTACT_TO_EMAIL,
-				msg.asRaw(),
-			);
-
-			await env.SEB.send(email);
 			return { ok: true };
 		},
 	}),

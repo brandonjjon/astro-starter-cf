@@ -12,11 +12,14 @@
 	"observability": {
 		"enabled": true,
 	},
-	// TODO: set destination_address to a verified address in your CF Email Routing
+	// Cloudflare Email Sending binding (https://developers.cloudflare.com/email-service).
+	// Prereq: your domain must be onboarded + verified in Dashboard → Email → Email Sending.
+	// Optional: uncomment `allowed_sender_addresses` to lock which From addresses this
+	// Worker can use (defense-in-depth against compromised code/config).
 	"send_email": [
 		{
-			"name": "SEB",
-			"destination_address": "hello@example.com",
+			"name": "EMAIL",
+			// "allowed_sender_addresses": ["noreply@yourdomain.com"],
 		},
 	],
 	// Uncomment to enable Astro sessions (KV-backed). Also add a `session:`
