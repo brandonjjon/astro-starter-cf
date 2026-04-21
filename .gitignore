@@ -21,12 +21,11 @@ playwright-report/
 .DS_Store
 .idea/
 
-# AI tooling local state (not shared)
-.agents/
-.augment/
-.claude/
-.codebuddy/
-.continue/
-.junie/
-.kiro/
-skills-lock.json
+# AI tooling: skills + agent instructions are shared.
+# Only ignore truly personal/session state.
+.claude/settings.local.json
+.claude/shell-snapshots/
+.claude/projects/
+.claude/todos/
+.claude/statsig/
+.claude/ide/
