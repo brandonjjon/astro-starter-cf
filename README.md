@@ -4,23 +4,20 @@ Opinionated GitHub template for marketing sites on **Astro + Cloudflare Pages**.
 
 ## Quickstart
 
+Prereqs: [`mise`](https://mise.jdx.dev) (`brew install mise`) — pins Bun + gitleaks for this project.
+
 ```bash
-# After clicking "Use this template" on GitHub
-gh repo clone your-org/your-new-site
+# After "Use this template" on GitHub and cloning
 cd your-new-site
-
-# Tooling (optional — respects .mise.toml)
-mise install
-
-# Deps + git hooks
-bun install
-bunx lefthook install
-
-# Local dev
+mise install          # Bun + gitleaks at pinned versions
+bun install           # deps
+bunx lefthook install # git hooks (once per clone)
 bun run dev
 ```
 
-Edit `src/consts.ts`, `wrangler.jsonc`, and `src/pages/index.astro` — you're off.
+Then edit `src/consts.ts`, `wrangler.jsonc`, and `src/pages/index.astro` — you're off.
+
+_Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install)); gitleaks is optional (`brew install gitleaks` — hook skips gracefully if absent).
 
 ## Features
 
@@ -42,7 +39,7 @@ Edit `src/consts.ts`, `wrangler.jsonc`, and `src/pages/index.astro` — you're o
 - **Vitest** unit + **Playwright** E2E + **axe-core** a11y + **Lighthouse CI**
 - **Renovate** with `minimumReleaseAge: 7 days`
 - **GitHub Actions** — CI (lint/type/test/build) + Lighthouse on PRs
-- **mise** pins Bun version
+- **mise** pins Bun + gitleaks per project
 
 ## Scripts
 
@@ -75,18 +72,7 @@ Edit `src/consts.ts`, `wrangler.jsonc`, and `src/pages/index.astro` — you're o
    - `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
    - Secrets via `wrangler pages secret put TURNSTILE_SECRET_KEY`
 5. **OG image** — drop `public/og.png` (1200×630)
-
-## First-time setup checklist
-
-```bash
-cp .dev.vars.example .dev.vars   # fill values
-bunx lefthook install            # git hooks (manual — ignore-scripts safe)
-bunx playwright install chromium # for E2E
-```
-
-Optional:
-
-- `brew install gitleaks` for secret-scan hook (silently skipped if missing)
+6. **E2E (optional)** — `bunx playwright install chromium` before running `bun run test:e2e`
 
 ## Project structure
 

@@ -6,13 +6,19 @@ import icon from 'astro-icon';
 
 import tailwindcss from '@tailwindcss/vite';
 
+// Skip the CF adapter under vitest — its vite plugin conflicts with vitest's
+// Node-based SSR resolution.
+const isTest = !!process.env.VITEST;
+
 export default defineConfig({
 	site: 'https://example.com',
-	adapter: cloudflare({
-		imageService: 'compile',
-		prerenderEnvironment: 'node',
-		configPath: './wrangler.jsonc',
-	}),
+	adapter: isTest
+		? undefined
+		: cloudflare({
+				imageService: 'compile',
+				prerenderEnvironment: 'node',
+				configPath: './wrangler.jsonc',
+			}),
 	integrations: [sitemap(), mdx(), icon()],
 
 	env: {
