@@ -3,89 +3,109 @@ import { actions } from 'astro:actions';
 import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/server';
 
 const result = Astro.getActionResult(actions.submitContact);
-
-// Cloudflare's official always-pass test site key. Used on *.workers.dev
-// so preview/test deploys work without configuring a real Turnstile site.
-// Real keys from the Turnstile dashboard are used on custom domains.
-// https://developers.cloudflare.com/turnstile/troubleshooting/testing/
-const TEST_SITE_KEY = '1x00000000000000000000AA';
-const isWorkersDevHost = Astro.url.hostname.endsWith('.workers.dev');
-const siteKey = isWorkersDevHost ? TEST_SITE_KEY : PUBLIC_TURNSTILE_SITE_KEY;
+const siteKey = PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
-<form
-	method="POST"
-	action={actions.submitContact}
-	class="mx-auto flex max-w-md flex-col gap-4"
->
-	<label class="flex flex-col gap-1 text-sm">
-		Name
-		<input
-			type="text"
-			name="name"
-			autocomplete="name"
-			required
-			maxlength="200"
-			class="rounded border border-black/20 px-3 py-2"
-		/>
-	</label>
-	<label class="flex flex-col gap-1 text-sm">
-		Email
-		<input
-			type="email"
-			name="email"
-			autocomplete="email"
-			required
-			maxlength="200"
-			class="rounded border border-black/20 px-3 py-2"
-		/>
-	</label>
-	<label class="flex flex-col gap-1 text-sm">
-		Message
-		<textarea
-			name="message"
-			required
-			minlength="10"
-			maxlength="5000"
-			rows="5"
-			class="rounded border border-black/20 px-3 py-2"></textarea>
-	</label>
-	{siteKey && <div class="cf-turnstile" data-sitekey={siteKey} />}
-	<button
-		type="submit"
-		class="rounded bg-black px-4 py-2 text-white hover:bg-black/80"
-	>
-		Send
-	</button>
-	{
-		result?.data?.ok && (
-			<p class="text-sm text-green-700">Thanks — we'll be in touch.</p>
-		)
-	}
-	{result?.error && <p class="text-sm text-red-700">{result.error.message}</p>}
-</form>
+{
+	result?.data?.ok ? (
+		<div class="mx-auto max-w-md rounded border border-green-200 bg-green-50 p-6 text-center">
+			<h2 class="text-lg font-semibold text-green-900">
+				Thanks — we'll be in touch.
+			</h2>
+			<p class="mt-2 text-sm text-green-800">Your message has been sent.</p>
+			<a href="/" class="mt-4 inline-block text-sm underline">
+				Back home
+			</a>
+		</div>
+	) : (
+		<form
+			method="POST"
+			action={actions.submitContact}
+			class="mx-auto flex max-w-md flex-col gap-4"
+		>
+			<label class="flex flex-col gap-1 text-sm">
+				Name
+				<input
+					type="text"
+					name="name"
+					autocomplete="name"
+					required
+					maxlength="200"
+					class="rounded border border-black/20 px-3 py-2"
+				/>
+			</label>
+			<label class="flex flex-col gap-1 text-sm">
+				Email
+				<input
+					type="email"
+					name="email"
+					autocomplete="email"
+					required
+					maxlength="200"
+					class="rounded border border-black/20 px-3 py-2"
+				/>
+			</label>
+			<label class="flex flex-col gap-1 text-sm">
+				Message
+				<textarea
+					name="message"
+					required
+					minlength="10"
+					maxlength="5000"
+					rows="5"
+					class="rounded border border-black/20 px-3 py-2"
+				/>
+			</label>
+			{siteKey && <div class="cf-turnstile" data-sitekey={siteKey} />}
+			<button
+				type="submit"
+				class="rounded bg-black px-4 py-2 text-white hover:bg-black/80 disabled:opacity-60"
+			>
+				<span data-idle>Send</span>
+				<span data-sending class="hidden">
+					Sending…
+				</span>
+			</button>
+			{result?.error && (
+				<p class="text-sm text-red-700">{result.error.message}</p>
+			)}
+		</form>
+	)
+}
 
 <script>
-	// Lazy-load Turnstile on first form interaction. Loading eagerly causes a
-	// "preload not used" console warning because api.js preloads its challenge
-	// script and the browser expects it to be used within a few seconds of
-	// page load. No-op when the widget isn't rendered (no siteKey → no
-	// .cf-turnstile in DOM). Bundled by Astro, so `script-src 'self'` covers
-	// it — no CSP hash needed.
+	// Progressive enhancement: show a "Sending…" state on the submit button
+	// during the brief window between form submit and the server response's
+	// full-page navigation. On JS-disabled browsers, submit still works —
+	// the user just sees the button sit idle for a second.
 	const form = document.querySelector('form');
-	const turnstileDiv = document.querySelector('.cf-turnstile');
-	if (form && turnstileDiv) {
-		let loaded = false;
-		const load = () => {
-			if (loaded) return;
-			loaded = true;
-			const s = document.createElement('script');
-			s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-			s.async = true;
-			s.defer = true;
-			document.head.appendChild(s);
-		};
-		form.addEventListener('focusin', load, { once: true });
-		form.addEventListener('pointerdown', load, { once: true });
+	if (form) {
+		const btn = form.querySelector('button[type="submit"]');
+		const idle = btn?.querySelector<HTMLElement>('[data-idle]');
+		const sending = btn?.querySelector<HTMLElement>('[data-sending]');
+		form.addEventListener('submit', () => {
+			idle?.classList.add('hidden');
+			sending?.classList.remove('hidden');
+		});
+
+		// Lazy-load Turnstile api.js on first form interaction, only if the
+		// widget div is present (i.e., user has configured Turnstile keys).
+		// Prevents the "preload not used within a few seconds" console warning
+		// by deferring the preload until just before it's needed.
+		const turnstileDiv = form.querySelector('.cf-turnstile');
+		if (turnstileDiv) {
+			let loaded = false;
+			const loadTurnstile = () => {
+				if (loaded) return;
+				loaded = true;
+				const s = document.createElement('script');
+				s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+				s.async = true;
+				s.defer = true;
+				document.head.appendChild(s);
+			};
+			form.addEventListener('focusin', loadTurnstile, { once: true });
+			form.addEventListener('pointerdown', loadTurnstile, { once: true });
+		}
 	}
 </script>
