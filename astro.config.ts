@@ -3,7 +3,12 @@ import { EventEmitter } from 'node:events';
 import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
-import { defineConfig, envField, fontProviders } from 'astro/config';
+import {
+	defineConfig,
+	envField,
+	fontProviders,
+	memoryCache,
+} from 'astro/config';
 import icon from 'astro-icon';
 
 import tailwindcss from '@tailwindcss/vite';
@@ -28,6 +33,45 @@ export default defineConfig({
 				inspectorPort: false,
 			}),
 	integrations: [sitemap(), mdx(), icon()],
+
+	// Prefetch links in the viewport; clientPrerender upgrades those to
+	// Speculation Rules prerenders on supported browsers (graceful fallback).
+	prefetch: {
+		prefetchAll: true,
+		defaultStrategy: 'viewport',
+	},
+
+	experimental: {
+		// Rust compiler — faster builds, better error messages.
+		// Requires @astrojs/compiler-rs. Won't auto-correct invalid HTML
+		// (e.g. <p><div/></p>); disables dev-toolbar audits.
+		rustCompiler: true,
+
+		// Queue-based renderer — more memory-efficient for large trees.
+		queuedRendering: { enabled: true },
+
+		// Client-side Speculation Rules API prerendering for prefetched links.
+		clientPrerender: true,
+
+		// JSON schemas for content-collection frontmatter in editors.
+		// Also set "astro.content-intellisense": true in VS Code settings.
+		contentIntellisense: true,
+
+		// Build-time SVGO optimization for imported .svg components.
+		svgo: true,
+
+		// Platform-agnostic route caching API. Requires on-demand rendering
+		// on a route (export const prerender = false) to take effect —
+		// no-op for fully prerendered pages.
+		cache: {
+			provider: memoryCache(),
+		},
+		// Optional: declarative per-route defaults. Uncomment when you have
+		// on-demand routes to cache.
+		// routeRules: {
+		//   '/api/*': { swr: 600 },
+		// },
+	},
 
 	security: {
 		// Astro auto-generates hashes for bundled scripts/styles and emits a

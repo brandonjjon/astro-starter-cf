@@ -7,5 +7,6 @@
 	"[astro]": {
 		"editor.defaultFormatter": "astro-build.astro-vscode"
 	},
-	"eslint.validate": ["astro", "javascript", "typescript", "typescriptreact"]
+	"eslint.validate": ["astro", "javascript", "typescript", "typescriptreact"],
+	"astro.content-intellisense": true
 }
