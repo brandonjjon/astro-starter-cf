@@ -49,5 +49,24 @@
 		"typescript": "^5.9.0",
 		"typescript-eslint": "^8.58.2",
 		"vitest": "^4.1.0"
+	},
+	"cloudflare": {
+		"bindings": {
+			"SITE_URL": {
+				"description": "Your public site origin (e.g. `https://example.com` or `https://your-worker.workers.dev`). Used at build time for canonical links, og:url, and sitemap URLs. Set to your Workers dev subdomain if you don't have a custom domain yet — you can change it later in Worker → Settings → Variables (re-deploy to regenerate the sitemap)."
+			},
+			"CONTACT_TO_EMAIL": {
+				"description": "Inbox that receives contact-form submissions. Any address — it doesn't need to be on your domain."
+			},
+			"CONTACT_FROM_EMAIL": {
+				"description": "Sender address for contact-form emails. Must be on a domain you've verified in [Email Sending](https://dash.cloudflare.com/?to=/:account/email/email-sending) (e.g. `noreply@yourdomain.com`)."
+			},
+			"TURNSTILE_SECRET_KEY": {
+				"description": "Turnstile secret key for server-side verification. Create at [Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile). Leave empty to disable captcha."
+			},
+			"PUBLIC_TURNSTILE_SITE_KEY": {
+				"description": "Turnstile site key (rendered in HTML — safe to expose). Must pair with the secret key above."
+			}
+		}
 	}
 }

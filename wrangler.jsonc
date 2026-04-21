@@ -12,6 +12,14 @@
 	"observability": {
 		"enabled": true,
 	},
+	// Plaintext env vars — Workers Builds forwards these to the build step AND
+	// runtime. The Deploy-to-CF button prompts for any value left empty or
+	// placeholder, using descriptions from package.json `cloudflare.bindings`.
+	"vars": {
+		"SITE_URL": "https://example.com",
+		"CONTACT_TO_EMAIL": "hello@example.com",
+		"CONTACT_FROM_EMAIL": "noreply@example.com",
+	},
 	// Cloudflare Email Sending binding (https://developers.cloudflare.com/email-service).
 	// Prereq: your domain must be onboarded + verified in Dashboard → Email → Email Sending.
 	// Optional: uncomment `allowed_sender_addresses` to lock which From addresses this
