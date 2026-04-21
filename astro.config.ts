@@ -31,12 +31,6 @@ export default defineConfig({
 
 	env: {
 		schema: {
-			PUBLIC_GA_MEASUREMENT_ID: envField.string({
-				context: 'client',
-				access: 'public',
-				optional: true,
-				default: '',
-			}),
 			PUBLIC_TURNSTILE_SITE_KEY: envField.string({
 				context: 'client',
 				access: 'public',

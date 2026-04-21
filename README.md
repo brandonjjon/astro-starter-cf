@@ -30,7 +30,7 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
 - **View Transitions** via `<ClientRouter />`
 - **Contact form** — Astro Action → Cloudflare `send_email` binding
 - **Cloudflare Turnstile** anti-spam (env-gated)
-- **Google Analytics 4** with `astro:page-load` handling (env-gated)
+- **Analytics-agnostic** — no vendor baked in. Use Cloudflare Zaraz (edge-loaded, zero code), Plausible, Umami, GA4, etc. — configure in CF dashboard or add a small component
 - **Security headers** (`public/_headers`) — CSP, HSTS, Permissions-Policy
 - **Strict TypeScript** + `astro check` in build
 - **ESLint** (flat config) + **Prettier** (+ astro plugin)
@@ -67,7 +67,6 @@ _Without mise:_ install Bun manually ([bun.sh/install](https://bun.sh/install));
    - Set `destination_address` in `wrangler.jsonc` → your verified address
    - Set `name:` in `wrangler.jsonc` + `package.json` to match your Pages project
 4. **Env vars** (Pages dashboard + local `.dev.vars`)
-   - `PUBLIC_GA_MEASUREMENT_ID` — GA4 (optional)
    - `PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` — anti-spam (optional)
    - `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
    - Secrets via `wrangler pages secret put TURNSTILE_SECRET_KEY`
@@ -94,6 +93,7 @@ test/              # Vitest
 ## Adding features later
 
 - **React (or any framework)** — `bun astro add react`, then use islands with `client:*` directives
+- **Analytics** — CF Zaraz (dashboard, no code) / Plausible / GA4 / Umami. For GA4 add a `<script>` with gtag; re-fire `page_view` on `document.addEventListener('astro:page-load', …)` so ClientRouter navigations track
 - **Sentry client errors** — `bun add @sentry/browser`, init in a `<script is:inline>` in `BaseHead.astro` gated by a DSN env var
 - **Blog** — drop MD/MDX into `src/content/posts/`, create `src/pages/blog/[...slug].astro` using `getCollection('posts')`
 

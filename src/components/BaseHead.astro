@@ -3,7 +3,6 @@ import '../styles/global.css';
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import { DEFAULT_OG_IMAGE } from '../consts';
-import GoogleAnalytics from './GoogleAnalytics.astro';
 import StructuredData from './StructuredData.astro';
 
 interface Props {
@@ -47,4 +46,3 @@ const imageURL = new URL(image, Astro.url);
 <meta property="twitter:image" content={imageURL} />
 
 <StructuredData />
-<GoogleAnalytics />
